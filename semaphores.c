@@ -23,11 +23,11 @@
 
 int main()
 {
-    sem_t * elephant_mice;  /* semaphore to keep Elephants and Mice separate */
+    sem_t * elephant_mice;   /* semaphore to keep Elephants and Mice separate */
     sem_t * dog_cats;        /* semaphore to keep Dog and Cat separate  */
     sem_t * cat_parrots;     /* semaphore to keep Cat and Parrot separate  */
     sem_t * mouse_parrots;   /* semaphore to keep Mouse and Parrot separate  */
-    sem_t * cat_mice;   /* semaphore to keep Mouse and Parrot separate  */
+    sem_t * cat_mice;        /* semaphore to keep Cat and Mice separate  */
   
     int pid;		/* Process id after fork call */
     int i;		/* Loop index. */
