@@ -67,6 +67,7 @@ void CloseRestaurant(BENSCHILLIBOWL* bcb) {
 
 /* add an order to the back of queue */
 int AddOrder(BENSCHILLIBOWL* bcb, Order* order) {
+    // applying lock so that the order is synchronized
     pthread_mutex_lock(&(bcb->mutex)); 
   
     // the restaurant has reached maximum number of orders the restaurant can handle at the moment
@@ -75,7 +76,6 @@ int AddOrder(BENSCHILLIBOWL* bcb, Order* order) {
         pthread_cond_wait(&(bcb->can_add_orders), &(bcb->mutex));
     }
     
-    // critical section
     // add order to rear of queue 
     order->order_number = bcb->next_order_number;
     AddOrderToBack(&(bcb->orders), order);
@@ -84,7 +84,10 @@ int AddOrder(BENSCHILLIBOWL* bcb, Order* order) {
     bcb->next_order_number += 1; 
     bcb->current_size += 1;
     
-    pthread_cond_broadcast(&(bcb->can_get_orders));   
+    // notify the process that it can get orders now
+    pthread_cond_broadcast(&(bcb->can_get_orders));
+  
+    // release lock
     pthread_mutex_unlock(&(bcb->mutex));
     
     return order->order_number;
@@ -92,11 +95,12 @@ int AddOrder(BENSCHILLIBOWL* bcb, Order* order) {
 
 /* remove an order from the queue */
 Order *GetOrder(BENSCHILLIBOWL* bcb) {
-    pthread_mutex_lock(&(bcb->mutex)); // grabbing the lock as order is in critical section
+    pthread_mutex_lock(&(bcb->mutex));
     
     // wait until the restaurant has any order to handle at the moment
     while(IsEmpty(bcb)) { 
-        // if expected number of orders have been fulfilled, unlock the mutex and return null(no more order left).
+        // if expected number of orders have been fulfilled, 
+        // unlock the mutex and return null (no more order will be taken).
         if (bcb->orders_handled >= bcb->expected_num_orders) {
             pthread_mutex_unlock(&(bcb->mutex));
             return NULL;
@@ -104,7 +108,7 @@ Order *GetOrder(BENSCHILLIBOWL* bcb) {
         pthread_cond_wait(&(bcb->can_get_orders), &(bcb->mutex));
     }
     
-    // Get order from queue(FIFO).
+    // get order from queue(FIFO).
     Order *order = bcb->orders;
     bcb->orders = bcb->orders->next;
     
@@ -112,14 +116,15 @@ Order *GetOrder(BENSCHILLIBOWL* bcb) {
     bcb->current_size -= 1; 
     bcb->orders_handled += 1;
     
+    // notify the process that it add get orders now
     pthread_cond_broadcast(&(bcb->can_add_orders));
         
-    // Release the lock.
+    // release the lock.
     pthread_mutex_unlock(&(bcb->mutex));   
     return order;
 }
 
-// Optional helper functions (you can implement if you think they would be useful)
+/* helper function to determine if there are any order available or not */
 bool IsEmpty(BENSCHILLIBOWL* bcb) {
   if (bcb->current_size == 0){
     return true;
@@ -129,6 +134,8 @@ bool IsEmpty(BENSCHILLIBOWL* bcb) {
   }
 }
 
+/* helper function to determine if the numbers of orders available 
+ * has reached maximum capacity */
 bool IsFull(BENSCHILLIBOWL* bcb) {
   if (bcb->current_size == bcb->max_size){
     return true;

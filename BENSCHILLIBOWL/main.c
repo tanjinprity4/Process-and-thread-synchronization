@@ -6,9 +6,9 @@
 
 // Feel free to play with these numbers! This is a great way to
 // test your implementation.
-#define BENSCHILLIBOWL_SIZE 100
-#define NUM_CUSTOMERS 5
-#define NUM_COOKS 10
+#define BENSCHILLIBOWL_SIZE 4
+#define NUM_CUSTOMERS 6
+#define NUM_COOKS 2
 #define ORDERS_PER_CUSTOMER 2
 #define EXPECTED_NUM_ORDERS NUM_CUSTOMERS * ORDERS_PER_CUSTOMER
 
@@ -59,16 +59,16 @@ void* BENSCHILLIBOWLCook(void* tid) {
     // get an order from the restaurant.
     order = GetOrder(bcb);
   
-    // take orders from the restaurants until it is not empty.
+    // get orders from the restaurants until there's no order available.
     while(order != NULL){
       // free the space taken by the order.
       free(order); 
-      orders_fulfilled++;
+      orders_fulfilled += 1;
       order = GetOrder(bcb);
     }
     
     printf("Cook #%d fulfilled %d orders\n", cook_id, orders_fulfilled);
-	return NULL;
+    return NULL;
 }
 
 /**
