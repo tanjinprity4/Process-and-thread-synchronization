@@ -7,9 +7,9 @@
 // Feel free to play with these numbers! This is a great way to
 // test your implementation.
 #define BENSCHILLIBOWL_SIZE 100
-#define NUM_CUSTOMERS 10
-#define NUM_COOKS 5
-#define ORDERS_PER_CUSTOMER 10
+#define NUM_CUSTOMERS 5
+#define NUM_COOKS 10
+#define ORDERS_PER_CUSTOMER 2
 #define EXPECTED_NUM_ORDERS NUM_CUSTOMERS * ORDERS_PER_CUSTOMER
 
 // Global variable for the restaurant.
@@ -39,7 +39,7 @@ void* BENSCHILLIBOWLCustomer(void* tid) {
       
       // add their order to the restaurant.
       int order_number = AddOrder(bcb, order);
-      printf("Customer with id:#%d added order #%d\n", customer_id, order_number);
+      printf("Customer #%d added order #%d\n", customer_id, order_number);
     }
     return NULL;
 }
@@ -55,7 +55,7 @@ void* BENSCHILLIBOWLCustomer(void* tid) {
 void* BENSCHILLIBOWLCook(void* tid) {
     int cook_id = (int)(long) tid;
     int orders_fulfilled = 0;
-    Order *order; 
+    Order *order;
     // get an order from the restaurant.
     order = GetOrder(bcb);
   
@@ -86,6 +86,7 @@ int main() {
     // Customers and Cooks are represented as Threads using the pthread library. 
     pthread_t customers[NUM_CUSTOMERS];
     int customer_id[NUM_CUSTOMERS];
+  
     for(int i = 0; i < NUM_CUSTOMERS; i++){
       customer_id[i] = i+1;
       pthread_create(&(customers[i]), NULL, BENSCHILLIBOWLCustomer, &(customer_id[i]));

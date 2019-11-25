@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
-#include <pthread.h>
 
 bool IsEmpty(BENSCHILLIBOWL* bcb);
 bool IsFull(BENSCHILLIBOWL* bcb);
@@ -47,7 +46,7 @@ BENSCHILLIBOWL* OpenRestaurant(int max_size, int expected_num_orders) {
     pthread_cond_init(&(bcb->can_get_orders), NULL);
   
     printf("Restaurant is open!\n");
-    return NULL;
+    return bcb;
 }
 
 /* check that the number of orders received is equal to the number handled (ie.fullfilled). 
